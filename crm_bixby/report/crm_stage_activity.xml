@@ -7,7 +7,7 @@
             <pivot string="Crm Stage Analysis" disable_linking="True">
                 <field name="stage_id" type="col"/>
                 <field name='lead_id' type="row"/>
-                <field name="stage_age" type="measure"/>
+                <field name="stage_change_age" type="measure"/>
             </pivot>
         </field>
     </record>

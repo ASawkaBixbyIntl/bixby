@@ -7,39 +7,49 @@ from odoo import api, fields, models
 
 class CrmStageActivity(models.Model):
     _name = 'crm.stage.activity'
+    _rec_name = 'lead_id'
 
-    lead_id = fields.Many2one('crm.lead')
-    stage_id = fields.Many2one('crm.stage')
-    stage_age = fields.Float(compute='_compute_stage_age', store=True)
-    last_stage_change_date = fields.Datetime('Last Stage Updated')
+    lead_id = fields.Many2one(comodel_name='crm.lead', string='Lead/Opportunity')
+    stage_id = fields.Many2one(comodel_name='crm.stage', string='Stage')
+    user_id = fields.Many2one(comodel_name='res.users', string='Salesperson')
+    date_stage_changed = fields.Datetime(string='Date Stage Updated')
+    date_last_stage_changed = fields.Datetime(string='Last Stage Updated')
+    stage_change_age = fields.Float(compute='_compute_stage_age', store=True)
 
     @api.multi
-    @api.depends('last_stage_change_date')
+    @api.depends('date_last_stage_changed')
     def _compute_stage_age(self):
         for activity in self:
-            activity.stage_age = (datetime.now() - fields.Datetime.from_string(activity.last_stage_change_date)).days
+            activity.stage_change_age = (fields.Datetime.from_string(fields.Datetime.now()) - fields.Datetime.from_string(activity.date_last_stage_changed)).days
 
 
 class CrmLead(models.Model):
     _inherit = 'crm.lead'
 
+    stage_activity_ids = fields.One2many(comodel_name='crm.stage.activity', inverse_name='lead_id', string='Stage Activity History')
+
     @api.multi
     def write(self, vals):
-        if vals.get('stage_id', False):
+        ret = super(CrmLead, self).write(vals)
+        if vals.get('stage_id', False) and ret:
             self.env['crm.stage.activity'].create({
                 'lead_id': self.id,
                 'stage_id': self.stage_id.id,
-                'last_stage_change_date': self.date_last_stage_update
-                })
-        return super(CrmLead, self).write(vals)
+                'user_id': self.env.user.id,
+                'date_stage_changed': fields.Datetime.now(),
+                'date_last_stage_changed': self.date_last_stage_update
+            })
+        return ret
 
     @api.model
     def create(self, vals):
         lead = super(CrmLead, self).create(vals)
-        if vals.get('stage_id', False):
+        if lead and vals.get('stage_id', False):
             self.env['crm.stage.activity'].create({
                 'lead_id': lead.id,
                 'stage_id': lead.stage_id.id,
-                'last_stage_change_date': self.date_last_stage_update
-                })
+                'user_id': self.env.user.id,
+                'date_stage_changed': fields.Datetime.now(),
+                'date_last_stage_changed': self.date_last_stage_update
+            })
         return lead

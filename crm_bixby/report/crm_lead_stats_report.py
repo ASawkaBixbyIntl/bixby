@@ -9,16 +9,18 @@ class CrmLeadStatsReport(models.Model):
     _description = "CRM Lead Statistics Analysis"
     _rec_name = 'move_count'
 
-    lead_id = fields.Many2one('crm.lead', readonly=True)
-    stage_id = fields.Many2one('crm.stage', readonly=True)
-    lead_age = fields.Integer('Created Since(Days)', readonly=True)
-    move_count = fields.Integer('Stage Change Count', readonly=True)
+    lead_id = fields.Many2one(comodel_name='crm.lead', string='Lead/Opportunity', readonly=True)
+    stage_id = fields.Many2one(comodel_name='crm.stage', string='Stage', readonly=True)
+    user_id = fields.Many2one(comoedel_name='res.users', string='Salesperson', readonly=True)
+    lead_age = fields.Integer(string='Stage Update Days', readonly=True)
+    move_count = fields.Integer(string='#Count Stage Changed', readonly=True)
 
     def _select(self):
         return """
             SELECT
                 c.id,
                 c.id as lead_id,
+                c.user_id,
                 c.stage_id,
                 count(mt.id) as move_count,
                 date_part('days', age(CURRENT_DATE, c.create_date::date)) as lead_age
