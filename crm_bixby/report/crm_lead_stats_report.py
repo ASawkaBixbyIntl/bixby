@@ -11,7 +11,7 @@ class CrmLeadStatsReport(models.Model):
 
     lead_id = fields.Many2one(comodel_name='crm.lead', string='Lead/Opportunity', readonly=True)
     stage_id = fields.Many2one(comodel_name='crm.stage', string='Stage', readonly=True)
-    user_id = fields.Many2one(comoedel_name='res.users', string='Salesperson', readonly=True)
+    user_id = fields.Many2one(comodel_name='res.users', string='Salesperson', readonly=True)
     lead_age = fields.Integer(string='Stage Update Days', readonly=True)
     move_count = fields.Integer(string='#Count Stage Changed', readonly=True)
 
