@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_crm_lead_stats_report,access_crm_lead_stats_report,model_crm_lead_stats_report,,1,1,1,1
+access_crm_stage_report,access_crm_stage_report,model_crm_stage_report,,1,1,1,1
+access_crm_stage_activity,access_crm_stage_activity,model_crm_stage_activity,,1,1,1,1
